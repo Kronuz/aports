@@ -2,7 +2,7 @@
 # Maintainer: Jakub Jirutka <jakub@jirutka.cz>
 pkgname=lld
 pkgver=6.0.1
-pkgrel=1
+pkgrel=0
 _llvmver=${pkgver%%.*}
 pkgdesc="The LLVM Linker"
 url="http://llvm.org"
