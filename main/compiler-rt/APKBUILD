@@ -25,6 +25,13 @@ build() {
 	mkdir -p "$builddir"/build
 	cd "$builddir"/build
 
+	curl -LO http://cvsweb.netbsd.org/bsdweb.cgi/~checkout~/src/lib/csu/arch/$CARCH/crtbegin.S
+	curl -LO http://cvsweb.netbsd.org/bsdweb.cgi/~checkout~/src/lib/csu/arch/$CARCH/crtend.S
+	sed -i 's@RCSID(.*@@' crtbegin.S
+	sed -i 's@RCSID(.*@@' crtend.S
+	as crtbegin.S -o crtbegin.o
+	as crtend.S -o crtend.o
+
 	# compiler-rt uses llvm intrinsic types for testing
 	# and therefore requires clang
 	cmake .. \
@@ -64,6 +71,13 @@ package() {
 		ppc64le | s390x) ;;
 		*) mv usr/lib/linux usr/lib/clang/$pkgver/lib;;
 	esac
+
+	mv "$builddir"/build/crtbegin.o usr/lib/clang/$pkgver
+	ln usr/lib/clang/$pkgver/crtbegin.o usr/lib/clang/$pkgver/crtbeginS.o
+	ln usr/lib/clang/$pkgver/crtbegin.o usr/lib/clang/$pkgver/crtbeginT.o
+	mv "$builddir"/build/crtend.o usr/lib/clang/$pkgver
+	ln usr/lib/clang/$pkgver/crtend.o usr/lib/clang/$pkgver/crtendS.o
+	ln usr/lib/clang/$pkgver/crtend.o usr/lib/clang/$pkgver/crtendT.o
 }
 
 sha512sums="69850c1ad92c66977fa217cbfb42a6a3f502fbe3d1a08daa7fc4cfeb617a7736d231f8ad8d93b10b1ae29bd753315d2a2d70f9ff1f4d18a9a7cc81758d91f963  compiler-rt-6.0.1.src.tar.xz"
